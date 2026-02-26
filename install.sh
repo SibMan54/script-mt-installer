@@ -181,7 +181,9 @@ run_compose() {
 }
 
 print_link() {
-	local SECRET TLS_DOMAIN DOMAIN_HEX LONG_SECRET SERVER_IP LINK
+	local SECRET TLS_DOMAIN DOMAIN_HEX LONG_SECRET SERVER_IP LINK_IP LINK_DOMAIN
+	local FAKE_DOMAIN FAKE_DOMAIN_IPS
+
 	SECRET=$(cat "${INSTALL_DIR}/.secret" 2>/dev/null | tr -d '\n\r')
 	[[ -z "$SECRET" ]] && err "Секрет не найден в ${INSTALL_DIR}/.secret"
 
@@ -189,7 +191,10 @@ print_link() {
 		| head -n1 | sed -E 's/.*=[[:space:]]*"([^"]+)".*/\1/')
 	[[ -z "$TLS_DOMAIN" ]] && err "tls_domain не найден в ${INSTALL_DIR}/telemt.toml"
 
+	FAKE_DOMAIN="$TLS_DOMAIN"
+
 	DOMAIN_HEX=$(printf '%s' "$TLS_DOMAIN" | od -An -tx1 | tr -d ' \n')
+
 	if [[ "$SECRET" =~ ^[0-9a-fA-F]{32}$ ]]; then
 		LONG_SECRET="ee${SECRET}${DOMAIN_HEX}"
 	else
@@ -199,24 +204,54 @@ print_link() {
 	SERVER_IP=""
 	for url in https://ifconfig.me/ip https://icanhazip.com https://api.ipify.org https://checkip.amazonaws.com; do
 		raw=$(curl -s --connect-timeout 3 "$url" 2>/dev/null | tr -d '\n\r')
-		if [[ -n "$raw" ]] && [[ ! "$raw" =~ [[:space:]] ]] && [[ ! "$raw" =~ (error|timeout|upstream|reset|refused) ]] && [[ "$raw" =~ ^([0-9.]+|[0-9a-fA-F:]+)$ ]]; then
+		if [[ -n "$raw" ]] \
+		   && [[ ! "$raw" =~ [[:space:]] ]] \
+		   && [[ ! "$raw" =~ (error|timeout|upstream|reset|refused) ]] \
+		   && [[ "$raw" =~ ^([0-9.]+|[0-9a-fA-F:]+)$ ]]; then
 			SERVER_IP="$raw"
 			break
 		fi
 	done
+
 	if [[ -z "$SERVER_IP" ]]; then
 		SERVER_IP="YOUR_SERVER_IP"
 		warn "Не удалось определить внешний IP. Подставьте IP сервера в ссылку вручную."
 	fi
-	LINK="tg://proxy?server=${SERVER_IP}&port=${LISTEN_PORT}&secret=${LONG_SECRET}"
+
+	# --- Ссылка по IP (всегда) ---
+	LINK_IP="tg://proxy?server=${SERVER_IP}&port=${LISTEN_PORT}&secret=${LONG_SECRET}"
+
+	# --- Проверка, указывает ли FAKE_DOMAIN на SERVER_IP ---
+	FAKE_DOMAIN_IPS=$(getent ahosts "$FAKE_DOMAIN" | awk '{print $1}' | sort -u)
+
+	LINK_DOMAIN=""
+	for ip in $FAKE_DOMAIN_IPS; do
+		if [[ "$ip" == "$SERVER_IP" ]]; then
+			LINK_DOMAIN="tg://proxy?server=${FAKE_DOMAIN}&port=${LISTEN_PORT}&secret=${LONG_SECRET}"
+			break
+		fi
+	done
+
 	echo ""
 	echo -e "${GREEN}╔══════════════════════════════════════════════════════════╗${NC}"
-	echo -e "${GREEN}║  Ссылка для Telegram (Fake TLS)                         ║${NC}"
+	echo -e "${GREEN}║  Ссылки для Telegram (Fake TLS)                         ║${NC}"
 	echo -e "${GREEN}╚══════════════════════════════════════════════════════════╝${NC}"
 	echo ""
-	echo -e "  ${GREEN}${LINK}${NC}"
+
+	echo -e "  ${GREEN}По IP:${NC}"
+	echo -e "  ${GREEN}${LINK_IP}${NC}"
 	echo ""
-	echo "  Сохраните ссылку и не публикуйте её публично."
+
+	if [[ -n "$LINK_DOMAIN" ]]; then
+		echo -e "  ${GREEN}По домену (${FAKE_DOMAIN}):${NC}"
+		echo -e "  ${GREEN}${LINK_DOMAIN}${NC}"
+		echo ""
+	else
+		echo -e "  ${YELLOW}Домен ${FAKE_DOMAIN} не указывает на IP сервера (${SERVER_IP})${NC}"
+		echo ""
+	fi
+
+	echo "  Сохраните ссылки и не публикуйте их публично."
 	echo ""
 	echo "  Данные установки: ${INSTALL_DIR}"
 	echo "  Логи:            cd ${INSTALL_DIR} && docker compose logs -f"
