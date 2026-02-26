@@ -1,0 +1,14 @@
+tcp:
+  routers:
+    mtproxy:
+      rule: "HostSNI(`*`)"
+      entryPoints:
+        - websecure
+      service: mtproxy
+      tls:
+        passthrough: true
+  services:
+    mtproxy:
+      loadBalancer:
+        servers:
+          - address: "telemt:1234"

@@ -1,0 +1,37 @@
+# Скопируйте в telemt.toml и подставьте свой секрет (openssl rand -hex 16).
+# Домен в censorship.tls_domain должен совпадать с правилом HostSNI в traefik/dynamic/tcp.yml.
+
+show_link = ["docker"]
+
+[general]
+prefer_ipv6 = false
+fast_mode = true
+use_middle_proxy = false
+
+[general.modes]
+classic = false
+secure = false
+tls = true
+
+[server]
+port = 1234
+listen_addr_ipv4 = "0.0.0.0"
+listen_addr_ipv6 = "::"
+
+[censorship]
+tls_domain = "1c.ru"
+mask = true
+mask_port = 443
+fake_cert_len = 2048
+
+[access]
+replay_check_len = 65536
+ignore_time_skew = false
+
+[access.users]
+docker = "ПОДСТАВЬТЕ_32_СИМВОЛА_HEX"
+
+[[upstreams]]
+type = "direct"
+enabled = true
+weight = 10
