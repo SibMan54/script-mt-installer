@@ -1,18 +1,22 @@
 # Script MT installer
 
-## Установка на сервере (всё тянется с GitHub)
+## ⚙️ Установка на сервере (всё тянется с GitHub)
 
-### ✅ Неинтерактивно - автоустановка
-```bash
-curl -sSL https://raw.githubusercontent.com/SibMan54/script-mt-installer/refs/heads/main/install.sh | bash
-```
 ### ✅ Интерактивно - с запросом порта и домена
 ```bash
 bash <(curl -Ls https://raw.githubusercontent.com/SibMan54/script-mt-installer/refs/heads/main/install.sh)
 ```
+### ✅ Неинтерактивно - автоустановка
+```bash
+curl -sSL https://raw.githubusercontent.com/SibMan54/script-mt-installer/refs/heads/main/install.sh | bash
+```
 
 ## Удаление
 
+```bash
+bash <(curl -Ls https://raw.githubusercontent.com/SibMan54/script-mt-installer/refs/heads/main/uninstall.sh)
+```
+или
 ```bash
 curl -sSL https://raw.githubusercontent.com/SibMan54/script-mt-installer/refs/heads/main/uninstall.sh | bash
 ```
