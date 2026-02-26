@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-REPO_RAW="${REPO_RAW:-https://raw.githubusercontent.com/itcaat/mtproto-installer/main}"
+REPO_RAW="${REPO_RAW:-https://raw.githubusercontent.com/SibMan54/script-mt-installer/refs/heads/main}"
 INSTALL_DIR="${INSTALL_DIR:-$(pwd)/mtproxy-data}"
 FAKE_DOMAIN="${FAKE_DOMAIN:-1c.ru}"
 TELEMT_INTERNAL_PORT="${TELEMT_INTERNAL_PORT:-1234}"
@@ -26,7 +26,7 @@ fetch() {
 
 rerun_cmd() {
 	if [[ "$0" == *bash* ]] || [[ "$0" == -* ]]; then
-		echo "curl -sSL https://raw.githubusercontent.com/itcaat/mtproto-installer/main/install.sh | bash"
+		echo "curl -sSL https://raw.githubusercontent.com/SibMan54/script-mt-installer/refs/heads/main/install.sh | bash"
 	else
 		local dir
 		dir="$(cd "$(dirname "$0")" && pwd)"
