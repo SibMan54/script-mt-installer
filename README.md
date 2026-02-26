@@ -2,7 +2,7 @@
 
 ## ⚙️ Установка на сервере (всё тянется с GitHub)
 
-### ✅ Интерактивно - с запросом порта и домена
+### ❓ Интерактивно - с запросом порта и домена
 ```bash
 bash <(curl -Ls https://raw.githubusercontent.com/SibMan54/script-mt-installer/refs/heads/main/install.sh)
 ```
@@ -11,12 +11,13 @@ bash <(curl -Ls https://raw.githubusercontent.com/SibMan54/script-mt-installer/r
 curl -sSL https://raw.githubusercontent.com/SibMan54/script-mt-installer/refs/heads/main/install.sh | bash
 ```
 
-## Удаление
+## ❌ Удаление
 
+### ❓ С запросом
 ```bash
 bash <(curl -Ls https://raw.githubusercontent.com/SibMan54/script-mt-installer/refs/heads/main/uninstall.sh)
 ```
-или
+### ✅ Без запроса
 ```bash
 curl -sSL https://raw.githubusercontent.com/SibMan54/script-mt-installer/refs/heads/main/uninstall.sh | bash
 ```
